@@ -1,0 +1,182 @@
+openapi: 3.1.0
+info:
+  title: Geoportail Luxembourg API
+  version: 1.0.0
+  description: |
+    Query geospatial features, elevation, and search locations using the Geoportail Luxembourg public API.
+    Supports location name input, geospatial feature discovery, and elevation lookup.
+
+servers:
+  - url: https://apiv3.geoportail.lu/proj/1.0
+
+paths:
+  /search:
+    get:
+      operationId: searchLocation
+      summary: Search for a location or address and return coordinates
+      parameters:
+        - name: q
+          in: query
+          required: true
+          description: Location name (e.g., Luxembourg City)
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Search results with coordinates
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        geometry:
+                          type: object
+                          properties:
+                            coordinates:
+                              type: array
+                              items:
+                                type: number
+                        label:
+                          type: string
+
+  /elevation:
+    get:
+      operationId: getElevation
+      summary: Get elevation at a specific coordinate
+      parameters:
+        - name: lon
+          in: query
+          required: true
+          description: Longitude
+          schema:
+            type: number
+        - name: lat
+          in: query
+          required: true
+          description: Latitude
+          schema:
+            type: number
+      responses:
+        '200':
+          description: Elevation in meters
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  elevation:
+                    type: number
+
+  /identify:
+    get:
+      operationId: identifyFeature
+      summary: Identify features at a specific map point
+      parameters:
+        - name: layer
+          in: query
+          required: true
+          description: Name of the layer (e.g., batiments)
+          schema:
+            type: string
+        - name: lon
+          in: query
+          required: true
+          schema:
+            type: number
+        - name: lat
+          in: query
+          required: true
+          schema:
+            type: number
+        - name: tolerance
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: crs
+          in: query
+          required: false
+          schema:
+            type: string
+            default: EPSG:4326
+      responses:
+        '200':
+          description: Identified features at the location
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeoJSONFeatureCollection'
+
+  /features:
+    get:
+      operationId: getFeaturesByBbox
+      summary: Get features from a layer using a bounding box
+      parameters:
+        - name: layer
+          in: query
+          required: true
+          description: Name of the layer (e.g., batiments)
+          schema:
+            type: string
+        - name: bbox
+          in: query
+          required: true
+          description: Bounding box (minLon,minLat,maxLon,maxLat)
+          schema:
+            type: string
+        - name: crs
+          in: query
+          required: false
+          schema:
+            type: string
+            default: EPSG:4326
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: GeoJSON feature collection
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeoJSONFeatureCollection'
+
+components:
+  schemas:
+    GeoJSONFeatureCollection:
+      type: object
+      required: [type, features]
+      properties:
+        type:
+          type: string
+          enum: [FeatureCollection]
+          example: FeatureCollection
+        features:
+          type: array
+          items:
+            type: object
+            required: [type, geometry, properties]
+            properties:
+              type:
+                type: string
+                enum: [Feature]
+                example: Feature
+              geometry:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    example: Point
+                  coordinates:
+                    type: array
+                    items:
+                      type: number
+              properties:
+                type: object
