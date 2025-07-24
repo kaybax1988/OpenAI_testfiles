@@ -3,8 +3,7 @@ info:
   title: Geoportail Luxembourg API
   version: 1.0.0
   description: |
-    Query geospatial features, elevation, and search locations using the Geoportail Luxembourg public API.
-    Supports location name input, geospatial feature discovery, and elevation lookup.
+    Access geospatial data from Luxembourg’s national mapping API. Supports location search, elevation lookup, and querying map features (e.g., buildings) by coordinates or bounding box.
 
 servers:
   - url: https://apiv3.geoportail.lu/proj/1.0
@@ -34,6 +33,8 @@ paths:
                     items:
                       type: object
                       properties:
+                        label:
+                          type: string
                         geometry:
                           type: object
                           properties:
@@ -41,8 +42,6 @@ paths:
                               type: array
                               items:
                                 type: number
-                        label:
-                          type: string
 
   /elevation:
     get:
@@ -126,7 +125,7 @@ paths:
         - name: bbox
           in: query
           required: true
-          description: Bounding box (minLon,minLat,maxLon,maxLat)
+          description: Bounding box as minLon,minLat,maxLon,maxLat
           schema:
             type: string
         - name: crs
