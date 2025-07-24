@@ -3,10 +3,12 @@ info:
   title: Geoportail Luxembourg API
   version: 1.0.0
   description: |
-    Access geospatial data from Luxembourg’s national mapping API. Supports location search, elevation lookup, and querying map features (e.g., buildings) by coordinates or bounding box.
+    Access geospatial data from Luxembourg’s national mapping API. 
+    Supports location search, elevation lookup, and querying map features (e.g., buildings) by coordinates or bounding box.
 
 servers:
   - url: https://apiv3.geoportail.lu/proj/1.0
+    description: Production server for Geoportail Luxembourg
 
 paths:
   /search:
@@ -151,7 +153,9 @@ components:
   schemas:
     GeoJSONFeatureCollection:
       type: object
-      required: [type, features]
+      required:
+        - type
+        - features
       properties:
         type:
           type: string
@@ -161,7 +165,10 @@ components:
           type: array
           items:
             type: object
-            required: [type, geometry, properties]
+            required:
+              - type
+              - geometry
+              - properties
             properties:
               type:
                 type: string
